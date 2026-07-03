@@ -1,0 +1,6 @@
+numpy>=1.26
+numba>=0.59
+# opzionali: servono solo per exact_master/cp_slave/basin_probe
+ortools>=9.8
+# opzionale: solo per examples/make_results_xlsx.py
+openpyxl>=3.1
