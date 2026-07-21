@@ -20,7 +20,7 @@ public class GASPTest {
         List<Item> items = List.of(i1, i2, i3);
         
         // Short time limit for test
-        GASPParams params = new GASPParams(0.5, 0.2, 0.1, 2, 10, new int[]{10}, 3, false);
+        GASPParams params = new GASPParams(0.5, 0.2, 0.1, 2, 10, new int[]{10}, 3, false, "classic", 0.05, 1.0, 0.99, false, false, false, "off");
         GASP gasp = new GASP(items, k, params, 42L);
         
         GASPResult result = gasp.run();

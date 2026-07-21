@@ -52,6 +52,7 @@ from typing import Dict, List, Optional
 from .geometry import Item, Knapsack, Packing
 from .parreno_construct import _near_corner, _place_block, _apply_box
 from .grasp_parreno import _enumerate_configs, _construct
+from .greedy import ep_kph
 
 
 @dataclass
@@ -354,8 +355,28 @@ def solve_alns(items, ks, params=None, **kw):
     # block-repair objective: profit-greedy when maximising profit,
     # else the volume/best-fit pair already in REPAIR.
     init_obj = "bestprofit" if profit_mode else "bestvol"
-    _pls, cur_blocks = _construct_blocks(items, ks, p.allow_rotation,
-                                         init_obj, 0.0, rng)
+    
+    # Parreno Constructive
+    _pls_parr, blocks_parr = _construct_blocks(items, ks, p.allow_rotation,
+                                               init_obj, 0.0, rng)
+    val_parr = value(Packing(ks, _pls_parr))
+    
+    # EP Constructive
+    items_sorted = sorted(items, key=lambda it: it.profit if profit_mode else it.volume, reverse=True)
+    pk_ep = ep_kph(items_sorted, ks, criterion="RS", allow_rotation=p.allow_rotation)
+    val_ep = value(pk_ep)
+    
+    # Take the best
+    if val_ep > val_parr:
+        _pls = pk_ep.placements
+        cur_blocks = []
+        for p_ep in _pls:
+            box = (p_ep.x, p_ep.y, p_ep.z, p_ep.x2, p_ep.y2, p_ep.z2)
+            cur_blocks.append((box, [p_ep]))
+    else:
+        _pls = _pls_parr
+        cur_blocks = blocks_parr
+
     cur_pls = _pls
     cur_pk = Packing(ks, cur_pls)
     cur_v = value(cur_pk)

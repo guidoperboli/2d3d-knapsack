@@ -39,6 +39,10 @@ public class GreedyState {
     public Packing getPacking() {
         return packing;
     }
+    
+    public EPManager getEpManager() {
+        return epManager;
+    }
 
     public int getItemsProcessed() {
         return itemsProcessed;

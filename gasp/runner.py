@@ -86,7 +86,15 @@ def run_one(set_name: str, inst_idx: int, seed: int,
                         
     if solver == "java":
         from .java_backend import JavaGASP
-        r = JavaGASP(items, ks, params).run()
+        r = JavaGASP(items, ks, params, solver="gasp").run()
+    elif solver == "java_alns":
+        from .alns import ALNSParams
+        from .java_backend import JavaGASP
+        valid = set(ALNSParams.__dataclass_fields__.keys())
+        akw = {k: v for k, v in kw.items() if k in valid}
+        aparams = ALNSParams(time_limit=time_limit, seed=seed,
+                             allow_rotation=rotation, **akw)
+        r = JavaGASP(items, ks, aparams, solver="alns").run()
     else:
         from .adaptive import AdaptiveGASP
         r = AdaptiveGASP(items, ks, params).run()

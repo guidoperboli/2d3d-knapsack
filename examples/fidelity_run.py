@@ -65,14 +65,20 @@ DEFAULT_PLAN = [
 
 
 def _one(args):
-    cls, idx, max_iter, cap, seed = args
+    cls, idx, max_iter, cap, seed, solver = args
     from gasp.readers import load_set
-    from gasp.grasp_parreno import solve_grasp_parreno
     from gasp.ems_numba import warmup_dominance
     warmup_dominance()
     name, items, ks = load_set(cls, respect_orientation=True)[idx]
-    r = solve_grasp_parreno(items, ks, max_iter=max_iter, seed=seed,
-                            time_limit=cap)
+    if solver == "python":
+        from gasp.grasp_parreno import solve_grasp_parreno
+        r = solve_grasp_parreno(items, ks, max_iter=max_iter, seed=seed,
+                                time_limit=cap)
+    else:
+        from gasp.java_backend import JavaGASP
+        from gasp import GASPParams
+        params = GASPParams(time_limit=cap or 0.0, max_iter=max_iter, seed=seed, allow_rotation=False)
+        r = JavaGASP(items, ks, params, solver="gasp").run()
     return cls, name, round(r.best_fill, 2), r.iterations, round(r.elapsed, 1)
 
 
@@ -248,6 +254,8 @@ def main():
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--out", type=str, default="results/fidelity.json")
     ap.add_argument("--summary", type=str, default=None)
+    ap.add_argument("--solver", choices=["java", "python"], default="java",
+                    help="solver backend (default: java)")
     ap.add_argument("--xlsx", type=str, default=None,
                     help="scrive la tabella di fedelta' anche in un file "
                          "Excel al percorso indicato (es. "
@@ -286,7 +294,7 @@ def main():
         for idx, nm in enumerate(names):
             if nm in res[cls]:
                 continue
-            tasks.append((cls, idx, max_iter, cap, args.seed))
+            tasks.append((cls, idx, max_iter, cap, args.seed, args.solver))
 
     print(f"Fidelity run: {len(tasks)} istanze da eseguire "
           f"({sum(len(v) for v in res.values())} gia' in checkpoint).")

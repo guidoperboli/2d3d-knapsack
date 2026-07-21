@@ -31,8 +31,9 @@ HERE = Path(__file__).resolve().parent
 PY = sys.executable
 
 
-def phases(workers: int, smoke: bool):
+def phases(workers: int, smoke: bool, time_limit: int = 10):
     w = ["--workers", str(workers)]
+    t_str = str(time_limit)
     if smoke:   # collaudo rapido della catena (~1 minuto)
         return [
             ("tune_br", [PY, HERE / "tune_params.py", "--sets", "gcut",
@@ -80,16 +81,16 @@ def phases(workers: int, smoke: bool):
         ]
     return [
         ("tune_br", [PY, HERE / "tune_params.py", "--family", "br",
-                     "--configs", "20", "--seeds", "2", "--time", "10",
+                     "--configs", "20", "--seeds", "2", "--time", t_str,
                      "--out", "results/tuning_br.json",
                      "--best-out", "results/best_br.json", *w]),
         ("tune_classic", [PY, HERE / "tune_params.py", "--family",
                           "classic", "--configs", "16", "--seeds", "2",
-                          "--time", "10",
+                          "--time", t_str,
                           "--out", "results/tuning_classic.json",
                           "--best-out", "results/best_classic.json", *w]),
         ("br7_bestof10", [PY, HERE / "run_campaign.py", "--sets",
-                          "thpack7", "--seeds", "10", "--time", "10",
+                          "thpack7", "--seeds", "10", "--time", t_str,
                           "--config", "results/best_br.json",
                           "--respect-orientation", "--parreno-seed",
                           "--layout-search",
@@ -98,7 +99,7 @@ def phases(workers: int, smoke: bool):
                     "thpack1", "thpack2", "thpack3", "thpack4",
                     "thpack5", "thpack6", "thpack7", "thpack8",
                     "thpack9", "thpack10", "thpack11", "thpack12",
-                    "thpack13", "thpack14", "thpack15", "--time", "10",
+                    "thpack13", "thpack14", "thpack15", "--time", t_str,
                     "--config", "results/best_br.json",
                     "--respect-orientation", "--parreno-seed",
                     "--layout-search",
@@ -107,14 +108,14 @@ def phases(workers: int, smoke: bool):
                      "thpack1", "thpack2", "thpack3", "thpack4",
                      "thpack5", "thpack6", "thpack7", "thpack8",
                      "thpack9", "thpack10", "thpack11", "thpack12",
-                     "thpack13", "thpack14", "thpack15", "--time", "10",
+                     "thpack13", "thpack14", "thpack15", "--time", t_str,
                      "--respect-orientation", "--solver", "alns",
                      "--out", "results/br_alns.json", *w]),
         ("kp_gasp", [PY, HERE / "run_campaign.py", "--sets",
-                     "ngcut", "okp", "gcut", "--seeds", "5", "--time", "10",
+                     "ngcut", "okp", "gcut", "ep2", "ep3", "--seeds", "5", "--time", t_str,
                      "--out", "results/kp_gasp.json", *w]),
         ("kp_alns", [PY, HERE / "run_campaign.py", "--sets",
-                     "ngcut", "okp", "gcut", "--seeds", "5", "--time", "10",
+                     "ngcut", "okp", "gcut", "ep2", "ep3", "--seeds", "5", "--time", t_str,
                      "--solver", "alns", "--objective", "profit",
                      "--out", "results/kp_alns.json", *w]),
         ("ngcutfs", [PY, HERE / "run_campaign.py", "--sets", "ngcutfs1",
@@ -141,6 +142,8 @@ def main() -> None:
                     help="fasi da saltare")
     ap.add_argument("--smoke", action="store_true",
                     help="collaudo rapido della catena (~1 minuto)")
+    ap.add_argument("--time", type=int, default=10,
+                    help="tempo limite per singola istanza in secondi (default 10)")
     args = ap.parse_args()
 
     Path("results").mkdir(exist_ok=True)
@@ -155,7 +158,7 @@ def main() -> None:
     say(f"=== NOTTE DI CALCOLO: avvio (workers={args.workers}"
         f"{', SMOKE' if args.smoke else ''}) ===")
     t0 = time.time()
-    for name, cmd in phases(args.workers, args.smoke):
+    for name, cmd in phases(args.workers, args.smoke, args.time):
         if name in args.skip:
             say(f"--- fase {name}: SALTATA")
             continue

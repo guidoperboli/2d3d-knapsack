@@ -16,10 +16,11 @@ class MockPacking:
 
 class JavaGASP:
     """A drop-in replacement for AdaptiveGASP that delegates to the Java engine."""
-    def __init__(self, items: List[Item], knapsack: Knapsack, params=None):
+    def __init__(self, items: List[Item], knapsack: Knapsack, params=None, solver="gasp"):
         self.items = items
         self.knapsack = knapsack
         self.params = params
+        self.solver = solver
     
     def run(self) -> GASPResult:
         if not JAR_PATH.exists():
@@ -27,10 +28,11 @@ class JavaGASP:
             
         # 1. Build JSON input
         input_data = {
+            "solver": self.solver,
             "knapsack": {
-                "w": self.knapsack.w,
-                "d": self.knapsack.d,
-                "h": self.knapsack.h
+                "w": self.knapsack.W,
+                "d": self.knapsack.D,
+                "h": self.knapsack.H
             },
             "items": [
                 {

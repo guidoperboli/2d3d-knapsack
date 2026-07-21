@@ -310,10 +310,9 @@ def main() -> None:
     ap.add_argument("--parreno-seed", action="store_true",
                     help="semina la soluzione iniziale col costruttivo a "
                          "blocchi di Parreno (3D, forte su BR)")
-    ap.add_argument("--solver", choices=["gasp", "alns", "java"], default="gasp",
-                    help="solver: 'gasp' (default) o 'alns' (ALNS "
-                         "autonomo per container loading, max volume) "
-                         "o 'java' (backend compilato superveloce)")
+    ap.add_argument("--solver", choices=["gasp", "alns", "java", "java_alns"], default="java",
+                    help="solver: 'java' (default) backend compilato superveloce "
+                         "o 'gasp' o 'alns' (python pipeline) o 'java_alns'")
     ap.add_argument("--objective", choices=["volume", "profit"],
                     default="volume",
                     help="solo per --solver alns: obiettivo da "

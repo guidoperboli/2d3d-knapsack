@@ -18,6 +18,11 @@ public class Packing {
         this.placements = new ArrayList<>();
     }
 
+    public Packing(Knapsack knapsack, List<Placement> placements) {
+        this.knapsack = knapsack;
+        this.placements = new ArrayList<>(placements);
+    }
+
     public Knapsack getKnapsack() {
         return knapsack;
     }
