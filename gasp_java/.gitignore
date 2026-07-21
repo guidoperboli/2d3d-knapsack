@@ -1,0 +1,6 @@
+target/
+tmp_maven/
+dependency-reduced-pom.xml
+*.class
+.idea/
+*.iml

@@ -78,13 +78,19 @@ def run_one(set_name: str, inst_idx: int, seed: int,
                 round(r.elapsed, 3))
 
     from . import GASPParams
-    from .adaptive import AdaptiveGASP
-
+    
     if "pch_deltas" in kw and isinstance(kw["pch_deltas"], list):
         kw["pch_deltas"] = tuple(kw["pch_deltas"])
     params = GASPParams(time_limit=time_limit, seed=seed,
                         allow_rotation=rotation, **kw)
-    r = AdaptiveGASP(items, ks, params).run()
+                        
+    if solver == "java":
+        from .java_backend import JavaGASP
+        r = JavaGASP(items, ks, params).run()
+    else:
+        from .adaptive import AdaptiveGASP
+        r = AdaptiveGASP(items, ks, params).run()
+        
     fill = 100.0 * r.best_packing.used_volume / ks.volume
     # stage decomposition (3D): seed fill and pre-layout fill, when known
     seed_fill = (round(100.0 * r.seed_volume / ks.volume, 2)
