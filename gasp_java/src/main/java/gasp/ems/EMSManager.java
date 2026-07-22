@@ -76,23 +76,29 @@ public class EMSManager {
                 cand.add(s);
             }
         }
-        // sort by volume desc
-        cand.sort(Comparator.comparingLong(Space::getVolume).reversed());
-
-        List<Space> kept = new ArrayList<>();
-        for (int i = 0; i < cand.size(); i++) {
-            Space s = cand.get(i);
-            boolean dominated = false;
-            for (int j = 0; j < kept.size(); j++) {
-                if (kept.get(j).containsFast(s.x, s.y, s.z, s.x2, s.y2, s.z2)) {
-                    dominated = true;
-                    break;
+        
+        int n = cand.size();
+        if (n < 2) return cand;
+        
+        boolean[] keep = new boolean[n];
+        for (int i = 0; i < n; i++) keep[i] = true;
+        
+        for (int i = 0; i < n; i++) {
+            if (!keep[i]) continue;
+            Space si = cand.get(i);
+            for (int j = 0; j < n; j++) {
+                if (i == j || !keep[j]) continue;
+                Space sj = cand.get(j);
+                if (si.containsFast(sj.x, sj.y, sj.z, sj.x2, sj.y2, sj.z2)) {
+                    keep[j] = false;
                 }
             }
-            if (!dominated) {
-                kept.add(s);
-            }
         }
-        return kept;
+        
+        List<Space> result = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (keep[i]) result.add(cand.get(i));
+        }
+        return result;
     }
 }

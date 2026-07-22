@@ -53,7 +53,7 @@ public class LayerGreedy {
     }
 
     public Packing run(List<Item> items) {
-        Map<TypeKey, List<Item>> types = new HashMap<>();
+        Map<TypeKey, List<Item>> types = new java.util.LinkedHashMap<>();
         for (Item it : items) {
             TypeKey key = new TypeKey(it.w(), it.d(), it.h());
             types.computeIfAbsent(key, k -> new ArrayList<>()).add(it);
@@ -64,7 +64,7 @@ public class LayerGreedy {
         }
 
         List<Placement> placements = new ArrayList<>();
-        Map<TypeKey, List<Item>> avail = new HashMap<>(types);
+        Map<TypeKey, List<Item>> avail = new java.util.LinkedHashMap<>(types);
         int zBase = 0;
         int H = ks.H();
 

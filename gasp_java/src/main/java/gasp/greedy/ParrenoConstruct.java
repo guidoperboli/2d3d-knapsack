@@ -143,7 +143,7 @@ public class ParrenoConstruct {
     }
 
     public static Packing parrenoConstruct(List<Item> items, Knapsack ks, boolean allowRotation, String objective) {
-        Map<TypeKey, List<Item>> avail = new HashMap<>();
+        Map<TypeKey, List<Item>> avail = new java.util.LinkedHashMap<>();
         for (Item it : items) {
             TypeKey key = new TypeKey(it.w(), it.d(), it.h());
             avail.computeIfAbsent(key, k -> new ArrayList<>()).add(it);

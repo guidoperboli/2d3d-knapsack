@@ -147,7 +147,7 @@ public class ALNS {
         Set<Integer> keptIds = new HashSet<>();
         for (Placement p : placements) keptIds.add(p.item().idx());
         
-        Map<String, List<Item>> avail = new HashMap<>();
+        Map<String, List<Item>> avail = new java.util.LinkedHashMap<>();
         for (Item it : items) {
             if (!keptIds.contains(it.idx())) {
                 String key = it.w() + "_" + it.d() + "_" + it.h();
@@ -234,7 +234,7 @@ public class ALNS {
         Set<Integer> keptIds = new HashSet<>();
         for (Placement p : placements) keptIds.add(p.item().idx());
         
-        Map<String, List<Item>> avail = new HashMap<>();
+        Map<String, List<Item>> avail = new java.util.LinkedHashMap<>();
         for (Item it : items) {
             if (!keptIds.contains(it.idx())) {
                 String key = it.w() + "_" + it.d() + "_" + it.h();
