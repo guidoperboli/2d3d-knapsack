@@ -26,6 +26,16 @@
 # ==========================================
 echo "Inizio esecuzione job SLURM: $(date)"
 
+# ==========================================
+# Configurazione di Java 17 (locale o modulo)
+# ==========================================
+# Se hai installato Java localmente nella tua Home, scommenta queste righe:
+export JAVA_HOME="$HOME/jdk-17.0.10+7-jre"
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# Alternativamente, se il cluster mette a disposizione un modulo Java 17:
+# module load java/17
+
 # Eseguiamo il run della "notte di calcolo" con 32 workers
 # Assicurati di rinominare o cancellare la cartella "results/" prima
 # dell'invio se vuoi ricalcolare tutto da capo!
