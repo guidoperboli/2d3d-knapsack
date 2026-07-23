@@ -41,6 +41,6 @@ export PATH="$JAVA_HOME/bin:$PATH"
 # dell'invio se vuoi ricalcolare tutto da capo!
 
 source .venv/bin/activate
-.venv/bin/python examples/run_overnight.py --workers 32
+.venv/bin/python examples/run_overnight.py --workers 32 --time 60
 
 echo "Fine esecuzione job SLURM: $(date)"
