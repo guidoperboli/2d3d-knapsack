@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=run_overnight    # Nome del tuo job
+#SBATCH --job-name=gasp_test        # Nome del tuo job di test
 #SBATCH --output=run_%j.out         # File dove verrà salvato l'output (%j = ID del Job)
 #SBATCH --error=run_%j.err          # File dove verranno salvati gli eventuali errori
 #SBATCH --nodes=1                   # FONDAMENTALE: richiede 1 solo nodo (per la memoria condivisa)
 #SBATCH --ntasks=1                  # 1 task (il tuo script python principale)
-#SBATCH --cpus-per-task=6          # Alloca 32 core per i tuoi 32 workers
-#SBATCH --time=24:00:00             # Tempo massimo (qui impostato a 24 ore)
-#SBATCH --mem=32G                   # Memoria RAM totale (adattala se il job esplode in RAM)
+#SBATCH --cpus-per-task=2           # Alloca 2 core per il test
+#SBATCH --time=00:15:00             # Tempo massimo (impostato a 15 minuti)
+#SBATCH --mem=4G                    # Memoria RAM per il test
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=guido.perboli@polito.it
 
@@ -36,9 +36,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 # Alternativamente, se il cluster mette a disposizione un modulo Java 17:
 # module load java/17
 
-# Eseguiamo il run della "notte di calcolo" con 32 workers
-# Assicurati di rinominare o cancellare la cartella "results/" prima
-# dell'invio se vuoi ricalcolare tutto da capo!
+# Eseguiamo il run di test veloce (run_demo.py) per verificare l'ambiente Python e Java
 
 source .venv/bin/activate
 .venv/bin/python examples/run_demo.py
