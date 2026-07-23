@@ -3,6 +3,7 @@ instances and report the gap against the 1D knapsack upper bound,
 mirroring the experimental setup of Section 4."""
 
 import sys
+import subprocess
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -19,6 +20,12 @@ def report(name, items, knapsack, result, ub):
 
 
 def main(time_limit=5.0):
+    print("--- Java Version Info ---")
+    try:
+        subprocess.run(["java", "-version"])
+    except FileNotFoundError:
+        print("ERROR: 'java' command not found in PATH!")
+    print("-------------------------\n")
     print("GASP demo (time limit per instance: %.0f s)\n" % time_limit)
 
     # ---- 2D-KP, no rotation -----------------------------------------
