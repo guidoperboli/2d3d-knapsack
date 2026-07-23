@@ -88,7 +88,6 @@ public record Item(int idx, int w, int d, int h, double profit, boolean vw, bool
                 rots.sort(Comparator.<int[]>comparingInt(a -> a[0])
                         .thenComparingInt(a -> a[1])
                         .thenComparingInt(a -> a[2]));
-                
                 return rots.isEmpty() ? List.of(dims) : List.copyOf(rots);
             } else {
                 List<int[]> rots = new ArrayList<>();

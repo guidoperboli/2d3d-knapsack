@@ -288,7 +288,7 @@ public class ALNS {
                                 if ("bestvol".equals(obj)) {
                                     score = new Object[]{(long) -(bw * bd * bh), ncopies};
                                 } else if (wantProfit) {
-                                    score = new Object[]{-((double) rep.profit() * ncopies), ncopies};
+                                    score = new Object[]{-((double) rep.profit() * ncopies), (long) -(bw * bd * bh), ncopies};
                                 } else { // bestfit
                                     int[] gap = {fw - bw, fd - bd, fh - bh};
                                     Arrays.sort(gap);
@@ -296,21 +296,47 @@ public class ALNS {
                                 }
 
                                 boolean better = false;
-                                if (chosenScore == null) better = true;
-                                else {
-                                    if (obj.equals("bestvol") || wantProfit) {
-                                        double v1 = ((Number) score[0]).doubleValue();
-                                        double v2 = ((Number) chosenScore[0]).doubleValue();
-                                        if (v1 < v2) better = true;
-                                        else if (v1 == v2 && (int)score[1] < (int)chosenScore[1]) better = true;
-                                    } else {
+                                if (chosenScore == null) {
+                                    better = true;
+                                } else {
+                                    if ("bestvol".equals(obj)) {
+                                        long v1 = (long) score[0];
+                                        long v2 = (long) chosenScore[0];
+                                        if (v1 != v2) {
+                                            better = v1 < v2;
+                                        } else {
+                                            better = (int) score[1] < (int) chosenScore[1];
+                                        }
+                                    } else if (wantProfit) {
+                                        double p1 = (double) score[0];
+                                        double p2 = (double) chosenScore[0];
+                                        if (p1 != p2) {
+                                            better = p1 < p2;
+                                        } else {
+                                            long v1 = (long) score[1];
+                                            long v2 = (long) chosenScore[1];
+                                            if (v1 != v2) {
+                                                better = v1 < v2;
+                                            } else {
+                                                better = (int) score[2] < (int) chosenScore[2];
+                                            }
+                                        }
+                                    } else { // bestfit
                                         int[] g1 = (int[]) score[0];
                                         int[] g2 = (int[]) chosenScore[0];
+                                        boolean gapBetter = false;
+                                        boolean gapEqual = true;
                                         for(int i=0; i<3; i++) {
                                             if(g1[i] != g2[i]) {
-                                                better = g1[i] < g2[i];
+                                                gapBetter = g1[i] < g2[i];
+                                                gapEqual = false;
                                                 break;
                                             }
+                                        }
+                                        if (gapEqual) {
+                                            better = (int) score[1] < (int) chosenScore[1];
+                                        } else {
+                                            better = gapBetter;
                                         }
                                     }
                                 }
@@ -361,13 +387,12 @@ public class ALNS {
         
         // Initial Solution
         String initObj = profitMode ? "bestprofit" : "bestvol";
-        Packing bestPk = ParrenoConstruct.parrenoConstruct(items, ks, p.allowRotation(), initObj);
+        ParrenoConstruct.ParrenoResult initRes = ParrenoConstruct.parrenoConstructWithBlocks(items, ks, p.allowRotation(), initObj);
+        Packing bestPk = initRes.packing;
         
-        // Re-calculate blocks for Parreno solution (approximate by grouping single item placements for now, 
-        // actually ParrenoConstruct doesn't return blocks. We can reconstruct them but let's just make each placement a block for EP comparison)
         List<Block> curBlocks = new ArrayList<>();
-        for (Placement pl : bestPk.getPlacements()) {
-            curBlocks.add(new Block(new int[]{pl.x(), pl.y(), pl.z(), pl.x()+pl.w(), pl.y()+pl.d(), pl.z()+pl.h()}, List.of(pl)));
+        for (BlockResult br : initRes.blocks) {
+            curBlocks.add(new Block(br.box, br.placements));
         }
         
         // EP initial

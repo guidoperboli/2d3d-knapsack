@@ -34,6 +34,16 @@ public class ParrenoConstruct {
             this.box = box;
         }
     }
+
+    public static class ParrenoResult {
+        public final Packing packing;
+        public final List<BlockResult> blocks;
+
+        public ParrenoResult(Packing packing, List<BlockResult> blocks) {
+            this.packing = packing;
+            this.blocks = blocks;
+        }
+    }
     
     private static class TypeKey {
         int w, d, h;
@@ -143,6 +153,10 @@ public class ParrenoConstruct {
     }
 
     public static Packing parrenoConstruct(List<Item> items, Knapsack ks, boolean allowRotation, String objective) {
+        return parrenoConstructWithBlocks(items, ks, allowRotation, objective).packing;
+    }
+
+    public static ParrenoResult parrenoConstructWithBlocks(List<Item> items, Knapsack ks, boolean allowRotation, String objective) {
         Map<TypeKey, List<Item>> avail = new java.util.LinkedHashMap<>();
         for (Item it : items) {
             TypeKey key = new TypeKey(it.w(), it.d(), it.h());
@@ -152,6 +166,7 @@ public class ParrenoConstruct {
         List<Space> spaces = new ArrayList<>();
         spaces.add(new Space(0, 0, 0, ks.W(), ks.D(), ks.H()));
         List<Placement> placements = new ArrayList<>();
+        List<BlockResult> blocks = new ArrayList<>();
 
         while (!spaces.isEmpty()) {
             CornerResult bestCorner = null;
@@ -239,11 +254,12 @@ public class ParrenoConstruct {
 
             BlockResult br = placeBlock(s, bestCorner.sig, w, d, h, nx, ny, nz, members, ncopies);
             placements.addAll(br.placements);
+            blocks.add(br);
             avail.put(chosenKey, members.subList(ncopies, members.size()));
             spaces = applyBox(spaces, br.box);
         }
 
-        return new Packing(ks, placements);
+        return new ParrenoResult(new Packing(ks, placements), blocks);
     }
 
     private static int compareScores(Object[] a, Object[] b, String objective) {
