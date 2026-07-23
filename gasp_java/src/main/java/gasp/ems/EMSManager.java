@@ -77,6 +77,9 @@ public class EMSManager {
             }
         }
         
+        // Sort by volume desc to match Python baseline which sorts cand in-place before dominance checks
+        cand.sort(Comparator.comparingLong(Space::getVolume).reversed());
+        
         int n = cand.size();
         if (n < 2) return cand;
         
