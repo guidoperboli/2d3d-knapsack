@@ -226,6 +226,8 @@ public class ParrenoConstruct {
                                 Object[] score;
                                 if ("bestvol".equals(objective)) {
                                     score = new Object[]{(long) -(bw * bd * bh), ncopies};
+                                } else if ("bestprofit".equals(objective)) {
+                                    score = new Object[]{-((double) rep.profit() * ncopies), (long) -(bw * bd * bh)};
                                 } else {
                                     int[] gap = {fw - bw, fd - bd, fh - bh};
                                     Arrays.sort(gap);
@@ -267,6 +269,13 @@ public class ParrenoConstruct {
             long aVol = (long) a[0];
             long bVol = (long) b[0];
             if (aVol != bVol) return Long.compare(aVol, bVol);
+        } else if ("bestprofit".equals(objective)) {
+            double aProf = (double) a[0];
+            double bProf = (double) b[0];
+            if (aProf != bProf) return Double.compare(aProf, bProf);
+            long aVol = (long) a[1];
+            long bVol = (long) b[1];
+            return Long.compare(aVol, bVol);
         } else {
             int[] aGap = (int[]) a[0];
             int[] bGap = (int[]) b[0];

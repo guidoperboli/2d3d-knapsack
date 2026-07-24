@@ -19,8 +19,8 @@ public record ALNSParams(
 ) {
     public static ALNSParams defaultParams() {
         return new ALNSParams(
-            1000, 10.0, 0.1, 0.4, 0.05, 0.995, 200, 2.0, 0.5, 100,
-            1.5, 1.2, 0.8, false, "profit"
+            -1, 10.0, 0.15, 0.45, 0.02, 0.9995, 1500, 0.5, 0.1, 25,
+            4.0, 2.0, 1.0, true, "volume"
         );
     }
 }
