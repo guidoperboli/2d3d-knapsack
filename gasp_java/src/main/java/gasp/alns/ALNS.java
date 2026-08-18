@@ -50,15 +50,27 @@ public class ALNS {
     // --- Destroy Operators ---
 
     private List<Block> dRandom(List<Block> blocks, int k) {
-        List<Block> copy = new ArrayList<>(blocks);
-        Collections.shuffle(copy, rng);
-        return copy.subList(k, copy.size());
+        List<Integer> idx = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) idx.add(i);
+        Collections.shuffle(idx, rng);
+        Set<Integer> remove = new HashSet<>(idx.subList(0, k));
+        List<Block> keep = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) {
+            if (!remove.contains(i)) keep.add(blocks.get(i));
+        }
+        return keep;
     }
 
     private List<Block> dWorst(List<Block> blocks, int k) {
-        List<Block> sorted = new ArrayList<>(blocks);
-        sorted.sort(Comparator.comparingDouble(b -> blockVol(b.box())));
-        return sorted.subList(k, sorted.size());
+        List<Integer> idx = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) idx.add(i);
+        idx.sort(Comparator.comparingDouble(i -> blockVol(blocks.get(i).box())));
+        Set<Integer> remove = new HashSet<>(idx.subList(0, k));
+        List<Block> keep = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) {
+            if (!remove.contains(i)) keep.add(blocks.get(i));
+        }
+        return keep;
     }
 
     private List<Block> dRegion(List<Block> blocks, int k) {
@@ -94,15 +106,22 @@ public class ALNS {
         int[] b0 = seed.box();
         double diag = Math.sqrt(Math.pow(b0[3]-b0[0], 2) + Math.pow(b0[4]-b0[1], 2) + Math.pow(b0[5]-b0[2], 2)) + 1.0;
         
-        List<Block> sorted = new ArrayList<>(blocks);
-        sorted.sort(Comparator.comparingDouble(b -> {
+        List<Integer> idx = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) idx.add(i);
+        idx.sort(Comparator.comparingDouble(i -> {
+            Block b = blocks.get(i);
             double[] c = blockCenter(b.box());
             double dist = Math.sqrt(Math.pow(c[0]-sc[0], 2) + Math.pow(c[1]-sc[1], 2) + Math.pow(c[2]-sc[2], 2));
             double vdiff = Math.abs(blockVol(b.box()) - sv) / (sv + 1.0);
             return dist / diag + 0.5 * vdiff;
         }));
         
-        return sorted.subList(k, sorted.size());
+        Set<Integer> remove = new HashSet<>(idx.subList(0, k));
+        List<Block> keep = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) {
+            if (!remove.contains(i)) keep.add(blocks.get(i));
+        }
+        return keep;
     }
 
     private List<Block> dSegment(List<Block> blocks, int k) {
@@ -121,12 +140,19 @@ public class ALNS {
         if (blocks.size() <= 1) return blocks;
         int seedIdx = rng.nextInt(blocks.size());
         double[] focus = blockCenter(blocks.get(seedIdx).box());
-        List<Block> sorted = new ArrayList<>(blocks);
-        sorted.sort(Comparator.comparingDouble(b -> {
+        List<Integer> idx = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) idx.add(i);
+        idx.sort(Comparator.comparingDouble(i -> {
+            Block b = blocks.get(i);
             double[] c = blockCenter(b.box());
             return Math.pow(c[0]-focus[0], 2) + Math.pow(c[1]-focus[1], 2) + Math.pow(c[2]-focus[2], 2);
         }));
-        return sorted.subList(k, sorted.size());
+        Set<Integer> remove = new HashSet<>(idx.subList(0, k));
+        List<Block> keep = new ArrayList<>();
+        for (int i = 0; i < blocks.size(); i++) {
+            if (!remove.contains(i)) keep.add(blocks.get(i));
+        }
+        return keep;
     }
 
     // --- Repair Helpers ---
