@@ -9,6 +9,7 @@ from .geometry import Item, Knapsack
 
 # Assumes the jar is at gasp_java/target/gasp-solver.jar relative to project root
 JAR_PATH = Path(__file__).resolve().parents[1] / "gasp_java" / "target" / "gasp-solver.jar"
+LOCAL_JAVA = Path(__file__).resolve().parents[1] / "gasp_java" / "tmp_maven" / "jdk17" / "jdk-17.0.2" / "bin" / "java.exe"
 
 class MockPacking:
     def __init__(self, used_volume):
@@ -48,8 +49,9 @@ class JavaGASP:
         }
         
         # 2. Call Java JAR via subprocess (stdin/stdout)
+        java_cmd = str(LOCAL_JAVA) if LOCAL_JAVA.exists() else "java"
         proc = subprocess.run(
-            ["java", "-jar", str(JAR_PATH)],
+            [java_cmd, "-jar", str(JAR_PATH)],
             input=json.dumps(input_data).encode("utf-8"),
             capture_output=True
         )

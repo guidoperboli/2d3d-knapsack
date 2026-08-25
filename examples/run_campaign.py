@@ -137,13 +137,13 @@ def run_campaign(args) -> None:
         overrides_base["layout_search"] = True
     if getattr(args, "parreno_seed", False):
         overrides_base["parreno_seed"] = True
-    solver_arg = getattr(args, "solver", "java")
-    if solver_arg == "alns":
+    solver_arg = getattr(args, "solver", "java_alns")
+    if solver_arg in ("alns", "java_alns"):
         # ALNS is a standalone solver: it ignores GASP-only flags
         # (parreno_seed, layout_search are intrinsic to it) and carries
         # its own. Keep only respect_orientation, solver and objective.
         ro = overrides_base.get("respect_orientation", False)
-        overrides_base = {"solver": "alns"}
+        overrides_base = {"solver": solver_arg}
         if ro:
             overrides_base["respect_orientation"] = True
         obj = getattr(args, "objective", "volume")
@@ -313,9 +313,9 @@ def main() -> None:
     ap.add_argument("--parreno-seed", action="store_true",
                     help="semina la soluzione iniziale col costruttivo a "
                          "blocchi di Parreno (3D, forte su BR)")
-    ap.add_argument("--solver", choices=["gasp", "alns", "java", "java_alns"], default="java",
-                    help="solver: 'java' (default) backend compilato superveloce "
-                         "o 'gasp' o 'alns' (python pipeline) o 'java_alns'")
+    ap.add_argument("--solver", choices=["gasp", "alns", "java", "java_alns"], default="java_alns",
+                    help="solver: 'java_alns' (default) backend ALNS compilato "
+                         "o 'gasp' o 'alns' (python) o 'java' (GASP)")
     ap.add_argument("--objective", choices=["volume", "profit"],
                     default="volume",
                     help="solo per --solver alns: obiettivo da "
