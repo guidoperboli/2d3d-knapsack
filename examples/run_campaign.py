@@ -137,7 +137,8 @@ def run_campaign(args) -> None:
         overrides_base["layout_search"] = True
     if getattr(args, "parreno_seed", False):
         overrides_base["parreno_seed"] = True
-    if getattr(args, "solver", "gasp") == "alns":
+    solver_arg = getattr(args, "solver", "java")
+    if solver_arg == "alns":
         # ALNS is a standalone solver: it ignores GASP-only flags
         # (parreno_seed, layout_search are intrinsic to it) and carries
         # its own. Keep only respect_orientation, solver and objective.
@@ -148,6 +149,8 @@ def run_campaign(args) -> None:
         obj = getattr(args, "objective", "volume")
         if obj == "profit":
             overrides_base["objective_metric"] = "profit"
+    else:
+        overrides_base["solver"] = solver_arg
 
     # task = (set_name, name, inst_idx, rot, seed, overrides)
     tasks = []

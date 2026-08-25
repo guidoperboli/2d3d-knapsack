@@ -62,7 +62,7 @@ def run_one(set_name: str, inst_idx: int, seed: int,
     _ensure_warm()
     kw = dict(overrides or {})
     respect = bool(kw.pop("respect_orientation", False))
-    solver = kw.pop("solver", "gasp")
+    solver = kw.pop("solver", "java")
     name, items, ks = _get_instance(set_name, inst_idx, respect)
 
     if solver == "alns":

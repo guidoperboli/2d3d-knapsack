@@ -51,15 +51,14 @@ volte. Una iterazione = una costruzione randomizzata + una fase di
 improvement, esattamente come nel paper, con criterio di stop a numero di
 iterazioni alternativo al tempo.
 
-**Risultato di fedeltà (BR1, 5000 iterazioni vere):** *[CAMPIONE — 5
-istanze a 5000 iter; da estendere alle 100 della classe per il dato
-[CAMPAGNA]]*
+**Risultato di fedeltà (BR1, 5000 iterazioni vere):** *[CAMPIONE — 10
+istanze a 5000 iter]*
 
 | | fill medio | tempo |
 |---|---|---|
-| Nostra reimplementazione (Python) | 92,66 % | ~31 s/istanza |
+| Nostra reimplementazione (Python) | 92,97 % | ~39 s/istanza |
 | Parreño (Tab. 4, C++ 2008) *[RIFERIMENTO]* | 92,95 % | ~8 s/istanza |
-| **scarto** | **−0,29 punti** | — |
+| **scarto** | **+0,02 punti** | — |
 
 A parità di iterazioni la nostra reimplementazione riproduce il risultato
 pubblicato entro mezzo punto. Su BR7 il fill cresce monotonicamente con
@@ -106,18 +105,19 @@ scatole singole). Sei operatori di distruzione pesati adattivamente
 col costruttivo a blocchi; accettazione simulated-annealing con reheat;
 selezione operatori a roulette con aggiornamento pesi Ropke-Pisinger.
 
-**Risultato (BR7, 10 s, Python):** *[CAMPIONE — 6 istanze, 1 seed; da consolidare su 100 istanze e seed multipli]*
+**Risultato (BR7, 10 s, Python):** *[CAMPAGNA — 100 istanze, 1 seed]*
 
 | metodo | fill medio |
 |---|---|
-| **ALNS** | **90,6 %** |
-| GASP + seme + layout | 88,55 % |
+| GASP + seme + layout | **88,82 %** |
+| **ALNS** | 85,88 % |
 | GRASP Parreño 5000 iter (riferimento, minuti) | 91,62 % |
 
-L'ALNS supera il GASP di **+2,07 punti su ogni istanza** a parità di
-tempo e in Python, avvicinandosi a ~1,2 punti dal GRASP di Parreño ma in
-10 secondi anziché minuti. I pesi appresi premiano gli operatori "worst"
-e "related".
+Sull'intero set, il solver GASP con seme e ricerca sul layout supera l'ALNS
+di circa **2,9 punti percentuali**. Il risultato campionario si è rivelato
+non rappresentativo dell'intera classe; a 10 s il throughput dell'ALNS 
+risulta essere limitato rispetto al GASP. I pesi appresi continuano a
+premiare gli operatori "worst" e "related".
 
 **Nota sul budget.** A 10 s la ricostruzione regret-2 costa troppo per
 iterazione (dimezza i giri) e non si ripaga: è fuori dal pool di default,
@@ -133,19 +133,18 @@ blocchi, l'accettazione e il best-incumbent passano al profit totale; sul
 container loading profit e volume coincidono, quindi le due modalità si
 sovrappongono.
 
-**Risultato sul knapsack okp (molteplicità ~3 copie/tipo):** *[CAMPIONE — 5 istanze okp, 1 seed]*
+**Risultato sul knapsack okp (molteplicità ~3 copie/tipo):** *[CAMPAGNA — 5 istanze okp, 5 seed]*
 
 | | gap medio dall'ottimo |
 |---|---|
-| ALNS profit-aware | +1,13 % |
-| GASP | +1,32 % |
+| ALNS profit-aware | +0,79 % |
+| GASP | +0,79 % |
 
 Dove c'è molteplicità e profit ≠ volume, l'ALNS profit-aware è
-competitivo col GASP e lo supera su diverse istanze (es. okp2 e okp5
-raggiungono l'ottimo dove il GASP perde +1,8 % e +4,0 %). Dove la
-molteplicità manca (ngcut, ~2 copie), volume e profit danno lo stesso
-gap, perché i blocchi non si formano: lì il discriminante non è
-l'obiettivo ma la molteplicità.
+competitivo col GASP ed eguaglia i risultati (entrambi chiudono con 
+gap dello 0,79%). Dove la molteplicità manca (ngcut, ~2 copie), volume e 
+profit danno lo stesso gap, perché i blocchi non si formano: lì il 
+discriminante non è l'obiettivo ma la molteplicità.
 
 ## 6. Ricostruzione ibrida blocchi/EP a scelta adattiva
 
@@ -154,15 +153,16 @@ Il pool di ricostruzione include sia la ricostruzione a blocchi
 (`_rebuild_ep`). I pesi adattivi scelgono l'una o l'altra per-istanza,
 senza soglia di molteplicità a priori.
 
-**Risultato (knapsack profit, bassa molteplicità):** *[CAMPIONE — istanze ngcut singole, 1 seed]*
+**Risultato (knapsack profit, bassa molteplicità):** *[CAMPAGNA — set ngcut completo, 12 istanze, 5 seed]*
 
-| istanza | solo blocchi | blocchi + EP |
+| set | solver | gap medio dall'ottimo |
 |---|---|---|
-| ngcut01 | +4,9 % | **+0,0 %** (ottimo) |
-| ngcut03 | +6,9 % | **+0,0 %** (ottimo) |
+| ngcut | GASP | **0,00 %** (12/12 ottimi) |
+| ngcut | ALNS (ibrido blocchi+EP) | **0,00 %** (12/12 ottimi) |
 
-L'aggiunta dell'EP-repair porta all'ottimo proprio dove i blocchi
-degeneravano. Sul container loading ad alta molteplicità (BR7) il fill
+Entrambi i solver chiudono tutte le istanze ngcut all'ottimo provato su
+ogni seed. L'aggiunta dell'EP-repair nell'ALNS porta all'ottimo l'intero set,
+proprio dove l'uso esclusivo dei blocchi originariamente degenerava e falliva. Sul container loading ad alta molteplicità (BR7) il fill
 resta ~89 %, perché i pesi continuano a preferire i blocchi: la modifica
 è additiva e retrocompatibile.
 
