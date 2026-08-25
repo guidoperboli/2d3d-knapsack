@@ -51,7 +51,7 @@ class JavaGASP:
         # 2. Call Java JAR via subprocess (stdin/stdout)
         java_cmd = str(LOCAL_JAVA) if LOCAL_JAVA.exists() else "java"
         proc = subprocess.run(
-            [java_cmd, "-Xmx512m", "-Xms256m", "-jar", str(JAR_PATH)],
+            [java_cmd, "-Xmx512m", "-Xms256m", "-XX:+UseSerialGC", "-XX:ActiveProcessorCount=1", "-jar", str(JAR_PATH)],
             input=json.dumps(input_data).encode("utf-8"),
             capture_output=True
         )
