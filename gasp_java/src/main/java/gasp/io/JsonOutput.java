@@ -7,6 +7,7 @@ public class JsonOutput {
     public long volume;
     public int iterations;
     public double elapsed;
+    public double time_to_best;
     public List<PlacementData> placements;
 
     public static class PlacementData {

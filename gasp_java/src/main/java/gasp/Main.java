@@ -73,6 +73,7 @@ public class Main {
         double bestProfit;
         int iterations;
         double elapsed;
+        double timeToBest;
         
         if ("alns".equals(solver)) {
             ALNSParams alnsParams = ALNSParams.defaultParams();
@@ -101,6 +102,7 @@ public class Main {
             bestProfit = result.bestProfit();
             iterations = result.iterations();
             elapsed = result.elapsedSeconds();
+            timeToBest = result.timeToBest();
         } else {
             GASP gasp = new GASP(items, knapsack, params, null);
             GASPResult result = gasp.run();
@@ -108,6 +110,7 @@ public class Main {
             bestProfit = result.bestProfit();
             iterations = result.iterations();
             elapsed = result.elapsedSeconds();
+            timeToBest = result.timeToBest();
         }
 
         // Convert domain objects to Output DTO
@@ -116,6 +119,7 @@ public class Main {
         output.volume = bestPacking.usedVolume();
         output.iterations = iterations;
         output.elapsed = elapsed;
+        output.time_to_best = timeToBest;
         
         output.placements = new ArrayList<>();
         for (Placement p : bestPacking.getPlacements()) {

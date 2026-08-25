@@ -92,6 +92,7 @@ class ALNSResult:
     best_fill: float
     iterations: int
     elapsed: float
+    time_to_best: Optional[float] = None
     destroy_weights: Dict[str, float] = field(default_factory=dict)
     repair_weights: Dict[str, float] = field(default_factory=dict)
     history: List[float] = field(default_factory=list)

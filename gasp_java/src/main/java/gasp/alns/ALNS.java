@@ -461,6 +461,7 @@ public class ALNS {
         int since = 0;
         int it = 0;
         List<Double> history = new ArrayList<>();
+        double timeToBest = 0.0;
 
         while (true) {
             double elapsed = (System.currentTimeMillis() - startMs) / 1000.0;
@@ -497,6 +498,7 @@ public class ALNS {
                 bestPk = newPk;
                 reward = p.rewardBest();
                 since = 0;
+                timeToBest = elapsed;
             } else {
                 since++;
             }
@@ -549,6 +551,6 @@ public class ALNS {
         for (int i=0; i<nd; i++) opWeights.put(dNames[i], dw[i]);
         for (int i=0; i<nr; i++) opWeights.put(rNames[i], rw[i]);
 
-        return new ALNSResult(bestPk, bestV, it, (System.currentTimeMillis() - startMs) / 1000.0, history, opWeights);
+        return new ALNSResult(bestPk, bestV, it, (System.currentTimeMillis() - startMs) / 1000.0, timeToBest, history, opWeights);
     }
 }

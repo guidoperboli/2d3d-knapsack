@@ -75,6 +75,7 @@ class GASPResult:
     best_profit: float
     iterations: int
     elapsed: float
+    time_to_best: Optional[float] = None
     history: List[float] = field(default_factory=list)
     # stage decomposition (3D Container Loading diagnostics): used volume
     # of the initial seed and of the incumbent just before the final

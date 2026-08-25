@@ -9,6 +9,7 @@ public record ALNSResult(
     double bestProfit,
     int iterations,
     double elapsedSeconds,
+    double timeToBest,
     List<Double> history,
     Map<String, Double> opWeights
 ) {}

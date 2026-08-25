@@ -171,7 +171,7 @@ def run_campaign(args) -> None:
                 tasks.append((set_name, name, inst_idx, rot, seed, ov))
 
     def store(set_name, name, seed, profit, fill, k, t_start,
-              seed_fill=None, pre_fill=None, elapsed=None):
+              seed_fill=None, pre_fill=None, elapsed=None, time_to_best=None):
         rec = res[set_name][name]
         val = fill if rec["metric"] == "fill" else profit
         rec["runs"][str(seed)] = val
@@ -181,6 +181,8 @@ def run_campaign(args) -> None:
             rec.setdefault("prelayout_runs", {})[str(seed)] = pre_fill
         if elapsed is not None:
             rec.setdefault("time_runs", {})[str(seed)] = elapsed
+        if time_to_best is not None:
+            rec.setdefault("time_to_best_runs", {})[str(seed)] = time_to_best
         write_json_atomic(out, res)
         el = time.time() - t_start
         eta = el / (k + 1) * (len(tasks) - k - 1)
@@ -197,9 +199,9 @@ def run_campaign(args) -> None:
             from gasp.runner import run_one
             for k, (sn, name, ii, rot, seed, ov) in enumerate(tasks):
                 (_, profit, fill, sfill, pfill,
-                 el) = run_one(sn, ii, seed, args.time, rot, ov)
+                 el, tb) = run_one(sn, ii, seed, args.time, rot, ov)
                 store(sn, name, seed, profit, fill, k, t_start,
-                      sfill, pfill, el)
+                      sfill, pfill, el, tb)
         else:
             from concurrent.futures import (ProcessPoolExecutor,
                                             as_completed)
@@ -217,9 +219,9 @@ def run_campaign(args) -> None:
                 for k, fut in enumerate(as_completed(futs)):
                     sn, name, seed = futs[fut]
                     (_, profit, fill, sfill, pfill,
-                     el) = fut.result()
+                     el, tb) = fut.result()
                     store(sn, name, seed, profit, fill, k, t_start,
-                          sfill, pfill, el)
+                          sfill, pfill, el, tb)
     except KeyboardInterrupt:
         print("\nInterrotto: il checkpoint contiene tutte le run "
               "completate. Rilanciare lo stesso comando per riprendere.")
@@ -235,12 +237,12 @@ def summarize(res: dict) -> None:
     print("\n" + "=" * 96)
     print(f"{'set':<10} {'ist.':>5} {'seed':>4} {'single':>8} "
           f"{'mean':>8} {'std':>6} {'min':>8} {'max':>8} "
-          f"{'best-of':>8} {'t/ist(s)':>9} {'opt':>4}")
-    print("-" * 96)
+          f"{'best-of':>8} {'t/ist(s)':>9} {'t-best(s)':>9} {'opt':>4}")
+    print("-" * 106)
     for set_name in sorted(res):
         # per-instance aggregates, then averaged over instances
-        singles, means, stds, mins, maxs, bests, times = \
-            [], [], [], [], [], [], []
+        singles, means, stds, mins, maxs, bests, times, t_bests = \
+            [], [], [], [], [], [], [], []
         n_opt, n_seeds = 0, 0
         for name, rec in res[set_name].items():
             runs = list(rec["runs"].values())
@@ -250,6 +252,9 @@ def summarize(res: dict) -> None:
             tr = list(rec.get("time_runs", {}).values())
             if tr:
                 times.append(_st.mean(tr))
+            tbr = list(rec.get("time_to_best_runs", {}).values())
+            if tbr:
+                t_bests.append(_st.mean(tbr))
             if rec["metric"] == "fill":
                 vals = runs                       # higher better
                 s1 = rec["runs"].get("1", runs[0])
@@ -274,10 +279,11 @@ def summarize(res: dict) -> None:
         n = len(singles)
         avg = lambda xs: sum(xs) / len(xs)
         t_str = f"{avg(times):>8.2f}" if times else f"{'-':>8}"
+        tb_str = f"{avg(t_bests):>8.2f}" if t_bests else f"{'-':>8}"
         print(f"{set_name:<10} {n:>5} {n_seeds:>4} "
               f"{avg(singles):>7.2f}% {avg(means):>7.2f}% "
               f"{avg(stds):>5.2f} {avg(mins):>7.2f}% {avg(maxs):>7.2f}% "
-              f"{avg(bests):>7.2f}% {t_str} {n_opt:>4}")
+              f"{avg(bests):>7.2f}% {t_str} {tb_str} {n_opt:>4}")
     print("=" * 96)
     print("CLP (thpack*): valori = fill %. Altri set: valori = gap %.")
     print("PER IL CONFRONTO CON LA LETTERATURA usare 'mean' (media sui "

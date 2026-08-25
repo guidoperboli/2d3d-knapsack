@@ -285,6 +285,7 @@ public class GASP {
 
         int iterations = 0;
         int nonImproving = 0;
+        double timeToBest = 0.0;
 
         while (true) {
             double elapsed = (System.currentTimeMillis() - startMs) / 1000.0;
@@ -309,6 +310,7 @@ public class GASP {
                 best = current;
                 nonImproving = 0;
                 k++;
+                timeToBest = elapsed;
                 if ("adaptive".equals(p.updatePolicy())) {
                     policyWeights.put(policy, policyWeights.get(policy) + p.policyReward());
                 }
@@ -345,6 +347,6 @@ public class GASP {
             history.add(best.profit());
         }
 
-        return new GASPResult(best, best.profit(), iterations, (System.currentTimeMillis() - startMs) / 1000.0, history);
+        return new GASPResult(best, best.profit(), iterations, (System.currentTimeMillis() - startMs) / 1000.0, timeToBest, history);
     }
 }

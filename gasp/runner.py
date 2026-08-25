@@ -75,7 +75,7 @@ def run_one(set_name: str, inst_idx: int, seed: int,
         fill = r.best_fill
         profit = r.best_packing.profit
         return (name, float(profit), round(fill, 2), None, None,
-                round(r.elapsed, 3))
+                round(r.elapsed, 3), round(getattr(r, "time_to_best", None) or r.elapsed, 3))
 
     from . import GASPParams
     
@@ -106,4 +106,4 @@ def run_one(set_name: str, inst_idx: int, seed: int,
     pre_fill = (round(100.0 * r.pre_layout_volume / ks.volume, 2)
                 if r.pre_layout_volume is not None else None)
     return (name, float(r.best_profit), round(fill, 2), seed_fill,
-            pre_fill, round(r.elapsed, 3))
+            pre_fill, round(r.elapsed, 3), round(getattr(r, "time_to_best", None) or r.elapsed, 3))

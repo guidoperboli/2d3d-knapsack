@@ -51,7 +51,7 @@ class JavaGASP:
         # 2. Call Java JAR via subprocess (stdin/stdout)
         java_cmd = str(LOCAL_JAVA) if LOCAL_JAVA.exists() else "java"
         proc = subprocess.run(
-            [java_cmd, "-jar", str(JAR_PATH)],
+            [java_cmd, "-Xmx256m", "-Xms128m", "-jar", str(JAR_PATH)],
             input=json.dumps(input_data).encode("utf-8"),
             capture_output=True
         )
@@ -68,6 +68,7 @@ class JavaGASP:
             best_profit=output_data["profit"],
             iterations=output_data["iterations"],
             elapsed=output_data["elapsed"],
+            time_to_best=output_data.get("time_to_best", output_data["elapsed"]),
             history=[],
             seed_volume=None,
             pre_layout_volume=None

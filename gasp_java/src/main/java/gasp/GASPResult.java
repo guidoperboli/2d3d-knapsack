@@ -11,5 +11,6 @@ public record GASPResult(
     double bestProfit,
     int iterations,
     double elapsedSeconds,
+    double timeToBest,
     List<Double> history
 ) {}
