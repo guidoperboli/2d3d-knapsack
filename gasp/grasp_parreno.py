@@ -102,7 +102,7 @@ def _construct(items, ks, allow_rotation, objective, delta, rng):
     in placement order (needed by the improvement phase)."""
     by_type: Dict[tuple, List[Item]] = defaultdict(list)
     for it in items:
-        by_type[(it.w, it.d, it.h)].append(it)
+        by_type[(it.w, it.d, it.h, it.profit)].append(it)
     avail = {k: list(v) for k, v in by_type.items()}
     spaces = [(0, 0, 0, ks.W, ks.D, ks.H)]
     placements: List[Placement] = []
@@ -174,7 +174,7 @@ def _rebuild_from_partial(placements_keep, items, ks, allow_rotation,
     # group remaining items by original type
     by_type: Dict[tuple, List[Item]] = defaultdict(list)
     for it in items:
-        by_type[(it.w, it.d, it.h)].append(it)
+        by_type[(it.w, it.d, it.h, it.profit)].append(it)
     kept_item_ids = {p.item.idx for p in placements_keep}
     avail = {k: [it for it in v if it.idx not in kept_item_ids]
              for k, v in by_type.items()}

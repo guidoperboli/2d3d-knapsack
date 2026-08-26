@@ -47,21 +47,24 @@ public class ParrenoConstruct {
     
     private static class TypeKey {
         int w, d, h;
-        public TypeKey(int w, int d, int h) {
-            this.w = w; this.d = d; this.h = h;
+        double profit;
+        public TypeKey(int w, int d, int h, double profit) {
+            this.w = w; this.d = d; this.h = h; this.profit = profit;
         }
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TypeKey typeKey = (TypeKey) o;
-            return w == typeKey.w && d == typeKey.d && h == typeKey.h;
+            return w == typeKey.w && d == typeKey.d && h == typeKey.h && Double.compare(typeKey.profit, profit) == 0;
         }
         @Override
         public int hashCode() {
             int result = w;
             result = 31 * result + d;
             result = 31 * result + h;
+            long temp = Double.doubleToLongBits(profit);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
             return result;
         }
     }
@@ -159,7 +162,7 @@ public class ParrenoConstruct {
     public static ParrenoResult parrenoConstructWithBlocks(List<Item> items, Knapsack ks, boolean allowRotation, String objective) {
         Map<TypeKey, List<Item>> avail = new java.util.LinkedHashMap<>();
         for (Item it : items) {
-            TypeKey key = new TypeKey(it.w(), it.d(), it.h());
+            TypeKey key = new TypeKey(it.w(), it.d(), it.h(), it.profit());
             avail.computeIfAbsent(key, k -> new ArrayList<>()).add(it);
         }
 

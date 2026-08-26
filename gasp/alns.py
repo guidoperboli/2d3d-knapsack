@@ -141,7 +141,7 @@ def _rebuild_ep(keep_blocks, items, ks, allow_rotation, objective):
     kept_ids = {p.item.idx for (_b, pls) in keep_blocks for p in pls}
     by_type = defaultdict(list)
     for it in items:
-        by_type[(it.w, it.d, it.h)].append(it)
+        by_type[(it.w, it.d, it.h, it.profit)].append(it)
     avail = {k: [x for x in v if x.idx not in kept_ids]
              for k, v in by_type.items()}
     want_profit = (objective == "bestprofit")
@@ -191,7 +191,7 @@ def _rebuild(keep_blocks, items, ks, allow_rotation, objective, regret=False):
     kept_ids = {p.item.idx for (_b, pls) in keep_blocks for p in pls}
     by_type = defaultdict(list)
     for it in items:
-        by_type[(it.w, it.d, it.h)].append(it)
+        by_type[(it.w, it.d, it.h, it.profit)].append(it)
     avail = {k: [x for x in v if x.idx not in kept_ids]
              for k, v in by_type.items()}
 

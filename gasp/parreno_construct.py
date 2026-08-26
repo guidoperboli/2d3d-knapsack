@@ -130,7 +130,7 @@ def parreno_construct(items: List[Item], ks: Knapsack,
     {'bestfit', 'bestvol'}."""
     by_type: Dict[tuple, List[Item]] = defaultdict(list)
     for it in items:
-        by_type[(it.w, it.d, it.h)].append(it)
+        by_type[(it.w, it.d, it.h, it.profit)].append(it)
     avail = {k: list(v) for k, v in by_type.items()}
     spaces = [(0, 0, 0, ks.W, ks.D, ks.H)]
     placements: List[Placement] = []

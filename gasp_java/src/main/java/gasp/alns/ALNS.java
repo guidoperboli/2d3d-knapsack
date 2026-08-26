@@ -176,7 +176,7 @@ public class ALNS {
         Map<String, List<Item>> avail = new java.util.LinkedHashMap<>();
         for (Item it : items) {
             if (!keptIds.contains(it.idx())) {
-                String key = it.w() + "_" + it.d() + "_" + it.h();
+                String key = it.w() + "_" + it.d() + "_" + it.h() + "_" + it.profit();
                 avail.computeIfAbsent(key, k -> new ArrayList<>()).add(it);
             }
         }
@@ -263,7 +263,7 @@ public class ALNS {
         Map<String, List<Item>> avail = new java.util.LinkedHashMap<>();
         for (Item it : items) {
             if (!keptIds.contains(it.idx())) {
-                String key = it.w() + "_" + it.d() + "_" + it.h();
+                String key = it.w() + "_" + it.d() + "_" + it.h() + "_" + it.profit();
                 avail.computeIfAbsent(key, k -> new ArrayList<>()).add(it);
             }
         }
