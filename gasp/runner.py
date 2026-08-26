@@ -81,8 +81,12 @@ def run_one(set_name: str, inst_idx: int, seed: int,
     
     if "pch_deltas" in kw and isinstance(kw["pch_deltas"], list):
         kw["pch_deltas"] = tuple(kw["pch_deltas"])
+        
+    valid_gasp = set(GASPParams.__dataclass_fields__.keys())
+    gkw = {k: v for k, v in kw.items() if k in valid_gasp}
+    
     params = GASPParams(time_limit=time_limit, seed=seed,
-                        allow_rotation=rotation, **kw)
+                        allow_rotation=rotation, **gkw)
                         
     if solver == "java":
         from .java_backend import JavaGASP
