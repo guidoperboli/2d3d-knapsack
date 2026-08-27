@@ -67,7 +67,7 @@ def phases(workers: int, smoke: bool, time_limit: int = 10):
                      "--objective", "profit",
                      "--out", "results/kp_all.json", *w]),
         ("ngcutfs", [PY, HERE / "run_campaign.py", "--sets", "ngcutfs1",
-                     "ngcutfs2", "ngcutfs3", "--time", t_str,
+                     "ngcutfs2", "ngcutfs3", "--time", "10",
                      "--objective", "profit",
                      "--out", "results/ngcutfs.json", *w]),
         ("xlsx", [PY, HERE / "make_results_xlsx.py", "--input",
