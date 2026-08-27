@@ -85,14 +85,14 @@ def build(res: dict, out: Path) -> None:
         if is_fill:
             headers = (["Istanza", "n"] + seed_cols
                        + ["Mean fill %", "Std", "Min %", "Max %",
-                          "Best-of (NO conf.)", "Tempo medio (s)"])
-            widths = [16, 6] + [9] * n_seeds + [12, 7, 9, 9, 17, 14]
+                          "Best-of (NO conf.)", "Tempo medio (s)", "T. best medio (s)"])
+            widths = [16, 6] + [9] * n_seeds + [12, 7, 9, 9, 17, 14, 16]
         else:
             headers = (["Istanza", "n", "Rif. (" + metric + ")"]
                        + seed_cols
                        + ["Best profit", "Gap best %", "Gap mean %",
-                          "Gap S1 %", "Tempo medio (s)"])
-            widths = [16, 6, 13] + [11] * n_seeds + [12, 11, 11, 10, 14]
+                          "Gap S1 %", "Tempo medio (s)", "T. best medio (s)"])
+            widths = [16, 6, 13] + [11] * n_seeds + [12, 11, 11, 10, 14, 16]
         head(ws, headers, widths)
 
         r = 1
@@ -105,6 +105,8 @@ def build(res: dict, out: Path) -> None:
             vals = [runs.get(str(k)) for k in range(1, n_seeds + 1)]
             tr = list(rec.get("time_runs", {}).values())
             tmean = round(sum(tr) / len(tr), 3) if tr else None
+            tb = list(rec.get("time_to_best_runs", {}).values())
+            tbmean = round(sum(tb) / len(tb), 3) if tb else None
             first = get_column_letter(3 if is_fill else 4)
             last = get_column_letter((2 if is_fill else 3) + n_seeds)
             rng = f"{first}{r}:{last}{r}"
@@ -116,7 +118,7 @@ def build(res: dict, out: Path) -> None:
                              f"=ROUND(STDEVP({rng}),2)",
                              f"=ROUND(MIN({rng}),2)",
                              f"=ROUND(MAX({rng}),2)",
-                             f"=ROUND(MAX({rng}),2)", tmean])
+                             f"=ROUND(MAX({rng}),2)", tmean, tbmean])
             else:
                 ref = rec["ref"]
                 bcol = get_column_letter(3 + n_seeds + 1)
@@ -125,7 +127,7 @@ def build(res: dict, out: Path) -> None:
                              f"=ROUND(100*($C{r}-{bcol}{r})/$C{r},2)",
                              f"=ROUND(100*($C{r}-AVERAGE({rng}))/$C{r},2)",
                              f'=IF(D{r}="","",ROUND(100*($C{r}-D{r})/$C{r},2))',
-                             tmean])
+                             tmean, tbmean])
                 if metric == "opt" and max(v for v in vals if v is not None) >= ref:
                     for c in ws[r]:
                         c.fill = GREEN
@@ -141,23 +143,27 @@ def build(res: dict, out: Path) -> None:
             mx = get_column_letter(2 + n_seeds + 4)   # Max
             bo = get_column_letter(2 + n_seeds + 5)   # Best-of
             tc = get_column_letter(2 + n_seeds + 6)   # Tempo
+            tbc = get_column_letter(2 + n_seeds + 7)  # T. best
             ws.append(["MEDIA", ""] + [""] * n_seeds
                       + [f"=ROUND(AVERAGE({mc}2:{mc}{r-1}),2)",
                          f"=ROUND(AVERAGE({sc}2:{sc}{r-1}),2)",
                          f"=ROUND(AVERAGE({mn}2:{mn}{r-1}),2)",
                          f"=ROUND(AVERAGE({mx}2:{mx}{r-1}),2)",
                          f"=ROUND(AVERAGE({bo}2:{bo}{r-1}),2)",
-                         f"=ROUND(AVERAGE({tc}2:{tc}{r-1}),3)"])
+                         f"=ROUND(AVERAGE({tc}2:{tc}{r-1}),3)",
+                         f"=ROUND(AVERAGE({tbc}2:{tbc}{r-1}),3)"])
         else:
             g1 = get_column_letter(3 + n_seeds + 2)
             g2 = get_column_letter(3 + n_seeds + 3)
             g3 = get_column_letter(3 + n_seeds + 4)
             tc = get_column_letter(3 + n_seeds + 5)   # Tempo
+            tbc = get_column_letter(3 + n_seeds + 6)  # T. best
             ws.append(["MEDIA", "", ""] + [""] * n_seeds
                       + ["", f"=ROUND(AVERAGE({g1}2:{g1}{r-1}),2)",
                          f"=ROUND(AVERAGE({g2}2:{g2}{r-1}),2)",
                          f"=ROUND(AVERAGE({g3}2:{g3}{r-1}),2)",
-                         f"=ROUND(AVERAGE({tc}2:{tc}{r-1}),3)"])
+                         f"=ROUND(AVERAGE({tc}2:{tc}{r-1}),3)",
+                         f"=ROUND(AVERAGE({tbc}2:{tbc}{r-1}),3)"])
         for c in ws[r]:
             c.font = FB
 
